@@ -14,18 +14,17 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@NoArgsConstructor
 @AllArgsConstructor
 public class UserPrincipal implements UserDetails {
     @EqualsAndHashCode.Include
-    private Long id;
-    private String username;
-    private String name;
+    private final Long id;
+    private final String username;
+    private final String name;
     @JsonIgnore
-    private String email;
+    private final String email;
     @JsonIgnore
-    private String password;
-    private Collection<? extends GrantedAuthority> authorities;
+    private final String password;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     public static UserPrincipal create(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream()
