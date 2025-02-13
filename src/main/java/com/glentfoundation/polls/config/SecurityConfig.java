@@ -1,4 +1,4 @@
-package com.glentfoundation.polls;
+package com.glentfoundation.polls.config;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                 .permitAll()
                 .anyRequest()
                 .authenticated();
-        //You can add custom JWT security filter
+        //You can add custom JWT security filter here
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
