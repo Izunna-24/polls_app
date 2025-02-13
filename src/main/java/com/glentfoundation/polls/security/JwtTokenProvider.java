@@ -2,7 +2,9 @@ package com.glentfoundation.polls.security;
 
 
 import com.glentfoundation.polls.repository.UserRepository;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +37,26 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .setSubject(Long.toString(userPrincipal.getId()))
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
     }
 
+    public Long getUserIdFromJwt(String token) {
+        return Long.parseLong(Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject());
+    }
+    public boolean validateToken(String authToken) {
+        try{
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            logger.error("Invalid JWT token", e.getMessage());
+        }
+        return false;
+    }
 }
