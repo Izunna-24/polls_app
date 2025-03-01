@@ -12,9 +12,10 @@ import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
-import java.awt.*;
+
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
