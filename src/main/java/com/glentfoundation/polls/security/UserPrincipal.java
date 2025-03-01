@@ -67,4 +67,8 @@ public class UserPrincipal implements UserDetails {
         UserPrincipal that = (UserPrincipal) o;
         return Objects.equals(id, that.id);
     }
+
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

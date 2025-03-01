@@ -2,9 +2,7 @@ package com.glentfoundation.polls.security;
 
 
 import com.glentfoundation.polls.repository.UserRepository;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.security.SignatureException;
 import java.util.Date;
 
 @Component
@@ -54,8 +53,16 @@ public class JwtTokenProvider {
         try{
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            logger.error("Invalid JWT token", e.getMessage());
+        } catch (SignatureException e) {
+            logger.error("Invalid JWT token");
+        }catch (MalformedJwtException e){
+            logger.error("Invalid JWT token");
+        }catch (ExpiredJwtException e){
+            logger.error("Expired JWT token");
+        }catch (UnsupportedJwtException e){
+            logger.error("Unsupported JWT token");
+        }catch (IllegalArgumentException e){
+            logger.error("JWT claims string is empty");
         }
         return false;
     }
