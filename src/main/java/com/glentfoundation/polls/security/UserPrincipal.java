@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -57,5 +58,13 @@ public class UserPrincipal implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+
+    public boolean equals(Object o ){
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserPrincipal that = (UserPrincipal) o;
+        return Objects.equals(id, that.id);
     }
 }
