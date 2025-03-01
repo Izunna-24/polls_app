@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
+
 @Getter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor
