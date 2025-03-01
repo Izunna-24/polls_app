@@ -42,19 +42,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // ✅ Correctly disabling CSRF
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ Corrected CORS configuration
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/favicon.ico", "/**/*.png", "/**/*.gif", "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css", "/**/*.js").permitAll()
+                        .requestMatchers("/", "/favicon.ico", "/*.png", "/*.gif", "/*.svg",
+                                "/*.jpg", "/*.html", "/*.css", "/*.js").permitAll() // ✅ Fixed wildcard issue
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/polls/**", "/api/users/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
-        // ✅ Registers JWT filter before UsernamePasswordAuthenticationFilter
+        // ✅ Ensure JWT filter is registered properly
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -64,7 +65,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(List.of("*")); // Adjust for production
+        configuration.setAllowedOriginPatterns(List.of("*")); // ✅ Fix for Spring Boot 6+
         configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
