@@ -5,13 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
 public class PollResponse {
     private Long id;
     private String question;
-    private List<ChoioceResponse> choices;
+    private List<ChoiceResponse> choices;
     private UserSummary createdBy;
     private Instant creationDateTime;
     private Instant expirationDateTime;
