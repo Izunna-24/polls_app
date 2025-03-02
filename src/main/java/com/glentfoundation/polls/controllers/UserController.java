@@ -8,13 +8,12 @@ import com.glentfoundation.polls.repository.UserRepository;
 import com.glentfoundation.polls.repository.VoteRepository;
 import com.glentfoundation.polls.security.CurrentUser;
 import com.glentfoundation.polls.security.UserPrincipal;
+import com.glentfoundation.polls.services.PollService;
 import com.glentfoundation.polls.utils.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -67,12 +66,12 @@ public class UserController {
     }
 
     @GetMapping("/users/{username}/votes")
-    public PagedResponse<PollResponse> getPollsVotedBy(@PathVariable(value = "username" String username,
+    public PagedResponse<PollResponse> getPollsVotedBy(@PathVariable(value = "username")String username,
                                                        @CurrentUser UserPrincipal currentUser,
                                                        @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
                                                        @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
         return pollService.getPollsVotedBy(username, currentUser,page,size);
-    })
+    }
 
 
 }
