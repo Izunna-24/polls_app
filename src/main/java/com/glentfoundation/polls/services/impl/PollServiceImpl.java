@@ -3,7 +3,6 @@ package com.glentfoundation.polls.services.impl;
 import com.glentfoundation.polls.exceptions.BadRequestException;
 import com.glentfoundation.polls.exceptions.ResourceNotFoundException;
 import com.glentfoundation.polls.models.*;
-import com.glentfoundation.polls.models.Vote;
 import com.glentfoundation.polls.payload.requests.PollRequest;
 import com.glentfoundation.polls.payload.requests.VoteRequest;
 import com.glentfoundation.polls.payload.requests.responses.PagedResponse;
@@ -115,24 +114,21 @@ public class PollServiceImpl implements PollService {
         Poll poll = pollRepository.findById(pollId)
                 .orElseThrow(() -> new ResourceNotFoundException("Poll", "id", pollId));
         if (poll.getExpirationDateTime().isBefore(Instant.now())) {
-            throw new BadRequestException("Sorry! This Poll has already expired");
+            throw new BadRequestException("Sorry! This Poll has expired");
         }
         User user = userRepository.findById(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", currentUser.getId()));
-
         Choice selectedChoice = poll.getChoices().stream()
                 .filter(choice -> choice.getId().equals(voteRequest.getChoiceId()))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Choice", "id", voteRequest.getChoiceId()));
-
         Vote vote = new Vote(user, poll, selectedChoice);
         try {
             voteRepository.save(vote);
         } catch (DataIntegrityViolationException exception) {
             logger.info("User {} has already voted in Poll {}", currentUser.getId(), pollId);
             throw new BadRequestException("Sorry! You already casted your vote in this poll");
-        }
-        return generatePollResponse(poll, currentUser);
+        }return generatePollResponse(poll, currentUser);
     }
 
 
@@ -140,12 +136,10 @@ public class PollServiceImpl implements PollService {
         if (polls.isEmpty()) {
             return new PagedResponse<>(Collections.emptyList(), 0, polls.getSize(), 0, 0, true);
         }
-
         List<Long> pollIds = polls.map(Poll::getId).getContent();
         Map<Long, Long> choiceVoteCountMap = getChoiceVoteCountMap(pollIds);
         Map<Long, Long> pollUserVoteMap = getPollUserVoteMap(currentUser, pollIds);
         Map<Long, User> creatorMap = getPollCreatorMap(polls.getContent());
-
         List<PollResponse> pollResponses = polls.map(poll ->
                 pollModelMapper.mapPollToPollResponse(poll, choiceVoteCountMap, creatorMap.get(poll.getCreatedBy()),
                         pollUserVoteMap == null ? null : pollUserVoteMap.getOrDefault(poll.getId(), null))
