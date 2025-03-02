@@ -2,8 +2,7 @@ package com.glentfoundation.polls.models;
 
 import com.glentfoundation.polls.models.audit.DateAudit;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name="votes", uniqueConstraints = {
@@ -13,8 +12,10 @@ import lombok.Setter;
         })
 })
 
+
 @Getter
 @Setter
+@NoArgsConstructor
 public class Vote extends DateAudit {
 
     @Id
@@ -32,6 +33,13 @@ public class Vote extends DateAudit {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public Vote(User user, Poll poll, Choice choice) {
+        this.user = user;
+        this.poll = poll;
+        this.choice = choice;
+    }
+
 
 
 }
