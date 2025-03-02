@@ -1,4 +1,4 @@
-package com.glentfoundation.polls.controller;
+package com.glentfoundation.polls.controllers;
 
 import com.glentfoundation.polls.exceptions.AppException;
 import com.glentfoundation.polls.models.Role;

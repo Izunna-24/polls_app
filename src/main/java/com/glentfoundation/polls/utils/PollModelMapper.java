@@ -25,25 +25,19 @@ public class PollModelMapper {
     public PollResponse mapPollToPollResponse(Poll poll, Map<Long, Long> choiceVotesMap, User creator, Long userVote) {
         PollResponse pollResponse = modelMapper.map(poll, PollResponse.class);
         pollResponse.setIsExpired(poll.getExpirationDateTime().isBefore(Instant.now()));
-
         List<ChoiceResponse> choiceResponses = poll.getChoices()
                 .stream()
                 .map(choice -> {
                     ChoiceResponse choiceResponse = modelMapper.map(choice, ChoiceResponse.class);
                     choiceResponse.setVoteCount(choiceVotesMap.getOrDefault(choice.getId(), 0L));
                     return choiceResponse;
-                })
-                .collect(Collectors.toList());
-
+                }).collect(Collectors.toList());
         pollResponse.setChoices(choiceResponses);
         pollResponse.setCreatedBy(new UserSummary(creator.getId(), creator.getUsername(), creator.getName()));
-
         if (userVote != null) {
             pollResponse.setSelectedChoice(userVote);
         }
-
         pollResponse.setTotalVotes(choiceResponses.stream().mapToLong(ChoiceResponse::getVoteCount).sum());
-
         return pollResponse;
     }
 }
