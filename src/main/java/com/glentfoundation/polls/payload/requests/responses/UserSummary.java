@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 public class UserSummary {
     private Long id;
-    private Long username;
-    private Long name;
+    private String username;
+    private String name;
 }
