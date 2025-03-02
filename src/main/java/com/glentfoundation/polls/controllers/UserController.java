@@ -2,14 +2,13 @@ package com.glentfoundation.polls.controllers;
 
 import com.glentfoundation.polls.exceptions.ResourceNotFoundException;
 import com.glentfoundation.polls.models.User;
-import com.glentfoundation.polls.payload.requests.responses.UserIdentityAvailability;
-import com.glentfoundation.polls.payload.requests.responses.UserProfile;
-import com.glentfoundation.polls.payload.requests.responses.UserSummary;
+import com.glentfoundation.polls.payload.requests.responses.*;
 import com.glentfoundation.polls.repository.PollRepository;
 import com.glentfoundation.polls.repository.UserRepository;
 import com.glentfoundation.polls.repository.VoteRepository;
 import com.glentfoundation.polls.security.CurrentUser;
 import com.glentfoundation.polls.security.UserPrincipal;
+import com.glentfoundation.polls.utils.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +50,7 @@ public class UserController {
         return new UserIdentityAvailability(isAvailable);
     }
 
+    @GetMapping("/users/{username}")
     public UserProfile getUserProfile(@PathVariable(value = "username") String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
         long pollCount  = pollRepository.countByCreatedBy(user.getId());
@@ -58,6 +58,21 @@ public class UserController {
         return new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt(), pollCount, voteCount);
     }
 
+    @GetMapping("/users/{username}/polls")
+    public PagedResponse<PollResponse> getPollsCreatedBy(@PathVariable(value = "username") String username,
+                                                         @CurrentUser UserPrincipal currentUser,
+                                                         @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+                                                         @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
+        return pollService.getPollsCreatedBy(username,currentUser,page,size);
+    }
+
+    @GetMapping("/users/{username}/votes")
+    public PagedResponse<PollResponse> getPollsVotedBy(@PathVariable(value = "username" String username,
+                                                       @CurrentUser UserPrincipal currentUser,
+                                                       @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
+                                                       @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
+        return pollService.getPollsVotedBy(username, currentUser,page,size);
+    })
 
 
 }
