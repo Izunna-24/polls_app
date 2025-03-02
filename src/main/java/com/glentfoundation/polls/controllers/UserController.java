@@ -1,6 +1,9 @@
 package com.glentfoundation.polls.controllers;
 
+import com.glentfoundation.polls.exceptions.ResourceNotFoundException;
+import com.glentfoundation.polls.models.User;
 import com.glentfoundation.polls.payload.requests.responses.UserIdentityAvailability;
+import com.glentfoundation.polls.payload.requests.responses.UserProfile;
 import com.glentfoundation.polls.payload.requests.responses.UserSummary;
 import com.glentfoundation.polls.repository.PollRepository;
 import com.glentfoundation.polls.repository.UserRepository;
@@ -12,10 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -44,6 +45,18 @@ public class UserController {
         return new UserIdentityAvailability(isAvailable);
     }
 
+    @GetMapping("/user/checkEmailAvailability")
+    public UserIdentityAvailability checkEmailAvailability(@RequestParam(value = "email") String email) {
+        Boolean isAvailable = !userRepository.existsByEmail(email);
+        return new UserIdentityAvailability(isAvailable);
+    }
+
+    public UserProfile getUserProfile(@PathVariable(value = "username") String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+        long pollCount  = pollRepository.countByCreatedBy(user.getId());
+        long voteCount = voteRepository.countByUserId(user.getId());
+        return new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt(), pollCount, voteCount);
+    }
 
 
 
