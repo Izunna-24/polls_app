@@ -12,24 +12,27 @@ import com.glentfoundation.polls.services.PollService;
 import com.glentfoundation.polls.utils.AppConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
 public class UserController {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private PollRepository pollRepository;
-    @Autowired
-    private VoteRepository voteRepository;
-    @Autowired
-    private PollService pollService;
+
+    private final UserRepository userRepository;
+    private final PollRepository pollRepository;
+    private final VoteRepository voteRepository;
+    private final PollService pollService;
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
+    public UserController(UserRepository userRepository, PollRepository pollRepository,
+                          VoteRepository voteRepository, PollService pollService) {
+        this.userRepository = userRepository;
+        this.pollRepository = pollRepository;
+        this.voteRepository = voteRepository;
+        this.pollService = pollService;
+    }
 
     @GetMapping("/user/me")
     @PreAuthorize("hasRole('USER')")
@@ -51,8 +54,9 @@ public class UserController {
 
     @GetMapping("/users/{username}")
     public UserProfile getUserProfile(@PathVariable(value = "username") String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-        long pollCount  = pollRepository.countByCreatedBy(user.getId());
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+        long pollCount = pollRepository.countByCreatedBy(user.getId());
         long voteCount = voteRepository.countByUserId(user.getId());
         return new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt(), pollCount, voteCount);
     }
@@ -62,16 +66,14 @@ public class UserController {
                                                          @CurrentUser UserPrincipal currentUser,
                                                          @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
                                                          @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
-        return pollService.getPollsCreatedBy(username,currentUser,page,size);
+        return pollService.getPollsCreatedBy(username, currentUser, page, size);
     }
 
     @GetMapping("/users/{username}/votes")
-    public PagedResponse<PollResponse> getPollsVotedBy(@PathVariable(value = "username")String username,
+    public PagedResponse<PollResponse> getPollsVotedBy(@PathVariable(value = "username") String username,
                                                        @CurrentUser UserPrincipal currentUser,
                                                        @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
                                                        @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
-        return pollService.getPollsVotedBy(username, currentUser,page,size);
+        return pollService.getPollsVotedBy(username, currentUser, page, size);
     }
-
-
 }
