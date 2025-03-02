@@ -1,5 +1,6 @@
 package com.glentfoundation.polls.controllers;
 
+import com.glentfoundation.polls.payload.requests.responses.UserIdentityAvailability;
 import com.glentfoundation.polls.payload.requests.responses.UserSummary;
 import com.glentfoundation.polls.repository.PollRepository;
 import com.glentfoundation.polls.repository.UserRepository;
@@ -13,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,8 +35,13 @@ public class UserController {
     @GetMapping("/user/me")
     @PreAuthorize("hasRole('USER')")
     public UserSummary getCurrentUser(@CurrentUser UserPrincipal currentUser) {
-        UserSummary userSummary = new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getName());
-        return userSummary;
+        return new UserSummary(currentUser.getId(), currentUser.getUsername(), currentUser.getName());
+    }
+
+    @GetMapping("/user/checkUsernameAvailability")
+    public UserIdentityAvailability checkUsernameAvailability(@RequestParam(value = "username") String username) {
+        Boolean isAvailable = !userRepository.existsByUsername(username);
+        return new UserIdentityAvailability(isAvailable);
     }
 
 
