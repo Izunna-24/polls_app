@@ -87,6 +87,7 @@ public class PollServiceImpl implements PollService {
         return mapPollsToPagedResponse(new PageImpl<>(polls), currentUser);
     }
 
+
     @Override
     public Poll createPoll(PollRequest pollRequest) {
         Poll poll = new Poll();
@@ -97,8 +98,10 @@ public class PollServiceImpl implements PollService {
         poll.setExpirationDateTime(Instant.now()
                 .plus(Duration.ofDays(pollRequest.getPollLength().getDays()))
                 .plus(Duration.ofHours(pollRequest.getPollLength().getHours())));
+        Poll savedPoll = pollRepository.save(poll);
+        log.info("Poll saved: {}", savedPoll);
 
-        return pollRepository.save(poll);
+        return savedPoll;
     }
 
     @Override
