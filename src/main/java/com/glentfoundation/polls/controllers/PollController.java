@@ -39,18 +39,18 @@ public class PollController {
         return pollService.getAllPolls(currentUser, page, size);
     }
 
-    @PostMapping
+    @PostMapping("/create")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> createPoll(@Valid @RequestBody PollRequest pollRequest) {
-        Poll poll = pollService.createPoll(pollRequest);
-
+    public ResponseEntity<?> createPoll(@Valid @RequestBody PollRequest pollRequest,
+                                        @CurrentUser UserPrincipal currentUser) {
+        Poll poll = pollService.createPoll(pollRequest, currentUser);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{pollId}")
                 .buildAndExpand(poll.getId())
                 .toUri();
-
         return ResponseEntity.created(location).body(new ApiResponse(true, "Poll created successfully " + poll));
     }
+
 
     @GetMapping("/{pollId}")
     public PollResponse getPollById(@CurrentUser UserPrincipal currentUser,

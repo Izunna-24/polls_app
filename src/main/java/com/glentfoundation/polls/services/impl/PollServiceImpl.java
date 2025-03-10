@@ -89,20 +89,24 @@ public class PollServiceImpl implements PollService {
 
 
     @Override
-    public Poll createPoll(PollRequest pollRequest) {
+    public Poll createPoll(PollRequest pollRequest, UserPrincipal currentUser) {
+        if (currentUser == null) {
+            throw new RuntimeException("User is not authenticated");
+        }
+        log.info("Creating poll for user ID: {}", currentUser.getId());
         Poll poll = new Poll();
         poll.setQuestion(pollRequest.getQuestion());
-
         pollRequest.getChoices().forEach(choiceRequest -> poll.addChoice(new Choice(choiceRequest.getText())));
-
         poll.setExpirationDateTime(Instant.now()
                 .plus(Duration.ofDays(pollRequest.getPollLength().getDays()))
                 .plus(Duration.ofHours(pollRequest.getPollLength().getHours())));
         Poll savedPoll = pollRepository.save(poll);
         log.info("Poll saved: {}", savedPoll);
-
         return savedPoll;
     }
+
+
+
 
     @Override
     public PollResponse getPollById(Long pollId, UserPrincipal currentUser) {

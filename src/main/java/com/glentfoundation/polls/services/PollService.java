@@ -12,7 +12,7 @@ public interface PollService {
     PagedResponse<PollResponse> getAllPolls(UserPrincipal currentUser, int page, int size);
     PagedResponse<PollResponse> getPollsCreatedBy(String username, UserPrincipal currentUser, int page, int size);
     PagedResponse<PollResponse> getPollsVotedBy(String username, UserPrincipal currentUser, int page, int size);
-    Poll createPoll(PollRequest pollRequest);
+    Poll createPoll(PollRequest pollRequest, UserPrincipal currentUser);
     PollResponse getPollById(Long pollId, UserPrincipal currentUser);
     PollResponse castVoteAndGetUpdatedPoll(Long pollId, VoteRequest voteRequest, UserPrincipal currentUser);
 }
