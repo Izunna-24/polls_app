@@ -36,7 +36,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t izunna587/polls:latest .
+        run: docker build -t izunna587/polls_app:latest .
 
       - name: Push Docker image to Docker Hub
-        run: docker push izunna587/polls:latest
+        run: docker push izunna587/polls_app:latest
